@@ -45,7 +45,6 @@ import { Categories } from "./assets/ConfigRoutes";
 import i18n from "./i18n";
 import Error404 from "./pages/Error404";
 function App() {
-  console.log("hello", Categories);
   // Load the preferred language from local storage and set it initially
   useEffect(() => {
     const storedLanguage = localStorage.getItem('preferred_language');
