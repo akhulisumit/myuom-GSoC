@@ -84,14 +84,9 @@ export default function HomePage() {
         initial="initial"
         animate="inView"
         variants={stagger}
-        templateColumns={{
-          base: "repeat(1, 1fr)",
-          md: "repeat(2, 1fr)",
-          lg: "repeat(3, 1fr)",
-          xl: "repeat(4, 1fr)",
-        }}
+        className="home-grid"
         w={{ sm: "100%", md: "80%", lg: "60%", "2xl": "60%", "3xl": "50%" }}
-        gap={{ base: 4, md: 6, lg: 8 }}
+        gap={{ sm: 4, md: 6, lg: 8 }}
       >
         {categoriesListForSearch.length === 0 ? (
           <Heading
