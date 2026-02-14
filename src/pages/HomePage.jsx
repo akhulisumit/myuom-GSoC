@@ -39,6 +39,7 @@
 import { useState } from "react";
 import { Categories } from "../assets/ConfigRoutes";
 import MenuBox from "../components/MenuBox";
+import Search from "../components/Search";
 import { Flex, Grid, Heading } from "@chakra-ui/react";
 
 import { motion } from "framer-motion";
@@ -63,10 +64,8 @@ function filterOutHiddenPages(categories) {
 export default function HomePage() {
   const [categoriesListForSearch, setCategoriesListForSearch] =
     useState(Categories);
-  const categoriesSorted = sortToPlaceInDefinedOrder(Categories);
-  const categoriesSortedAndWithoutHiddenPages =
-    filterOutHiddenPages(categoriesSorted);
   useScrollToTopOnLoad();
+
   return (
     <Flex
       direction="column"
@@ -78,14 +77,21 @@ export default function HomePage() {
       gap="3rem"
       px={{ sm: "1rem", md: "0px" }}
     >
+      <Search setCategoriesList={setCategoriesListForSearch} categoriesList={Categories} />
+
       <Grid
         as={motion.section}
         initial="initial"
         animate="inView"
         variants={stagger}
-        className="home-grid"
+        templateColumns={{
+          base: "repeat(1, 1fr)",
+          md: "repeat(2, 1fr)",
+          lg: "repeat(3, 1fr)",
+          xl: "repeat(4, 1fr)",
+        }}
         w={{ sm: "100%", md: "80%", lg: "60%", "2xl": "60%", "3xl": "50%" }}
-        gap={{ sm: 4, md: 6, lg: 8 }}
+        gap={{ base: 4, md: 6, lg: 8 }}
       >
         {categoriesListForSearch.length === 0 ? (
           <Heading
@@ -99,7 +105,8 @@ export default function HomePage() {
             H αναζήτηση δεν επέστρεψε αποτελέσματα.
           </Heading>
         ) : null}
-        {categoriesSortedAndWithoutHiddenPages.map((category) => (
+
+        {filterOutHiddenPages(sortToPlaceInDefinedOrder(categoriesListForSearch)).map((category) => (
           <MenuBox category={category} key={category.title} />
         ))}
       </Grid>
