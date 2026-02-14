@@ -97,7 +97,11 @@ export default function Header() {
               cursor="pointer"
               aria-label={i18n.t("home_page") || "Home Page"}
             >
-              <Image src={myUOMLogo} w={{ sm: "40px", xl: "60px" }} />
+              <Image
+                src={myUOMLogo}
+                alt="University of Macedonia Logo"
+                w={{ sm: "40px", xl: "60px" }}
+              />
             </Box>
             <Box
               display={{ sm: "block", lg: "none" }}
