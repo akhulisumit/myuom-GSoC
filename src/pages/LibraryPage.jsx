@@ -36,14 +36,63 @@
 
 */
 
-import { Flex, Box, Text, Button, useColorModeValue,Switch } from "@chakra-ui/react";
+import { Flex, Box, Text, Button, useColorModeValue, Switch, VStack, HStack, Icon, Badge } from "@chakra-ui/react";
 import i18n from "../i18n";
-import { TimeIcon, PhoneIcon } from "@chakra-ui/icons";
+import { TimeIcon, PhoneIcon, CalendarIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { LIBRARY_OPENING_HOURS, LIBRARY_PHONE_LIST } from "../assets/data/Library";
+
 export default function LibraryPage() {
   const [isExamPeriod, setisExamPeriod] = useState(false);
   const currentPeriod = isExamPeriod ? "InExams" : "InSemester";
+
+  // Get current day index (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+  const currentDayIndex = new Date().getDay();
+
+  // Helper to check if a specific schedule corresponds to today
+  const isToday = (dayType) => {
+    if (dayType === 'weekdays' && currentDayIndex >= 1 && currentDayIndex <= 5) return true;
+    if (dayType === 'saturday' && currentDayIndex === 6) return true;
+    if (dayType === 'sunday' && currentDayIndex === 0) return true;
+    return false;
+  };
+
+  const ScheduleRow = ({ label, time, dayType }) => {
+    const active = isToday(dayType);
+    const isOpen = time && time.start;
+
+    return (
+      <HStack
+        w="100%"
+        justify="space-between"
+        p={2}
+        bg={active ? useColorModeValue("blue.50", "whiteAlpha.200") : "transparent"}
+        borderRadius="md"
+        borderLeft={active ? "4px solid" : "none"}
+        borderColor={useColorModeValue("blue.500", "blue.200")}
+      >
+        <HStack>
+          <Icon as={allowedDaysIcons[dayType]} color={useColorModeValue("gray.600", "gray.300")} />
+          <Text fontWeight={active ? "bold" : "medium"}>{label}</Text>
+        </HStack>
+        {isOpen ? (
+          <Badge colorScheme="green" variant="subtle" px={2} borderRadius="full">
+            {time.start} - {time.end}
+          </Badge>
+        ) : (
+          <Badge colorScheme="red" variant="subtle" px={2} borderRadius="full">
+            {i18n.t("kleista")}
+          </Badge>
+        )}
+      </HStack>
+    );
+  };
+
+  const allowedDaysIcons = {
+    weekdays: CalendarIcon, // Placeholder, usually a calendar looks good
+    saturday: TimeIcon,
+    sunday: TimeIcon
+  };
 
   return (
     <Flex
@@ -51,203 +100,127 @@ export default function LibraryPage() {
       overflowX="none"
       flexDirection="column"
       alignItems="center"
+      fontFamily="Syne"
     >
       {/* Wrapper container */}
       <Flex
         textAlign="center"
         flexDirection={{ base: "column", lg: "row" }}
-        columnGap="3"
-        alignItems="center"
+        columnGap="6"
+        alignItems="stretch"
         justifyContent="center"
         width="100%"
-        height={{ lg: "75vh" }}
+        maxWidth="1200px"
         paddingX={{ sm: "2", base: "4", md: "8" }}
+        py={8}
       >
-        {/* Ωράριο */}
+        {/* Ωράριο Card */}
         <Box
-          border="2px"
-          borderRadius="1rem"
-          bg={useColorModeValue("#0050e0", "#f3f3f3")}
-          borderColor={useColorModeValue("#0050e0", "#f3f3f3")}
-          marginBottom={{ base: "2", lg: "0" }}
-          marginTop={{ lg: "fit-content" }}
-          px="4"
-          py="4"
-          width="100%"
-          display={"flex"}
-          textAlign={"center"}
-          justifyContent={"center"}
-          alignItems={"center"}
-          height={{ lg: "fit-content" }}
+          flex={1}
+          border="1px"
+          borderRadius="xl"
+          bg={useColorModeValue("white", "gray.800")}
+          borderColor={useColorModeValue("gray.200", "gray.700")}
+          boxShadow="lg"
+          p={6}
+          display="flex"
+          flexDirection="column"
         >
-          <Flex
-            flexDirection={"column"}
-            alignItems="flex-start"
-            h="fit-content"
-            fontFamily="Syne"
-            w="100%"
-            fontSize={{ base: "md", lg: "xl" }}
-            color={useColorModeValue("#f3f3f3", "black")}
-          >
-            <Flex flexDirection={"row"} alignItems="center">
-              <TimeIcon w={6} h={6} />
-              <Text
-                fontSize={{base: "lg",lg: "2xl"}}
-                ml="2"
-                as="span"
-                fontWeight={"bold"}
-              >
-                {i18n.t("orario")}{" "}
-                ({isExamPeriod ?  i18n.t("exams_period") : i18n.t("semester_period") })
-                 </Text>                 
-            </Flex>
-            <Flex mt="1rem" flexDirection={"row"} alignItems="center" gap={{base: "1px", lg: 2}} >
-              <Box mx="2" fontSize={{ base: "sm",  lg: "xl", }}>
-                <Text as="span" fontWeight={"bold"}>
-                  {i18n.t("defPar")}
-                </Text>{" "}
-                <br />
-                {LIBRARY_OPENING_HOURS[currentPeriod].on_weekdays.start}-
-                {LIBRARY_OPENING_HOURS[currentPeriod].on_weekdays.end}
-              </Box>
-             
-              <Box mx="2" fontSize={{ base: "sm",  lg: "xl", }}>
-                <Text as="span" fontWeight={"bold"}>
-                  {i18n.t("savvato")}
-                </Text>{" "}
-                <br />
-               
-                {LIBRARY_OPENING_HOURS[currentPeriod].on_saturday.start
-                  ? `${LIBRARY_OPENING_HOURS[currentPeriod].on_saturday.start}-${LIBRARY_OPENING_HOURS[currentPeriod].on_saturday.end}`
-                  : i18n.t("kleista")}
-              </Box>
-              <Box mx="2" fontSize={{ base: "sm",  lg: "xl", }}>
-                <Text as="span" fontWeight={"bold"}>
-                  {i18n.t("kyriaki")}
-                </Text>{" "}
-                <br />
-                {LIBRARY_OPENING_HOURS[currentPeriod].on_sunday.start
-                  ? `${LIBRARY_OPENING_HOURS[currentPeriod].on_sunday.start}-${LIBRARY_OPENING_HOURS[currentPeriod].on_sunday.end}`
-                  : i18n.t("kleista")}
-              </Box>
-            </Flex>
-            <br/>
-            <Button
-  onClick={() => setisExamPeriod((prev) => !prev)}
-  leftIcon={<TimeIcon />}
-  variant="outline"
-  mt="1.4"
-  size="sm"
-  bg={useColorModeValue("#f3f3f3", "black")}
-  _hover={{ bg: isExamPeriod ? useColorModeValue("#f3f3f3", "black") : useColorModeValue("#f3f3f3", "black") }}
->
-  {i18n.t(!isExamPeriod ? "exams_period": "semester_period") }
-</Button>
-          </Flex>
-          
-        </Box>
-        {/* Επικοινωνία  */}
-        <Box
-          border="2px"
-          borderRadius="1rem"
-          borderColor={useColorModeValue("#0050e0", "#f3f3f3")}
-          bg={useColorModeValue("#0050e0", "#f3f3f3")}
-          marginBottom={{ base: "2", lg: "0" }}
-          marginTop="2"
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
-          py="4"
-          px="3"
-          width="100%"
-          height={{ lg: "30%" }}
-          paddingX={{ sm: "2", base: "4",md: "8"}}
-        >
-          <Flex
-            mx="2"
-            flexDirection={"column"}
-            alignItems="flex-start"
-            rowGap={3}
-            justifyContent={"flex-start"}
-            columnGap={3}
-            color={useColorModeValue("#f3f3f3", "black")}
-            fontFamily="Syne"
-            w="100%"
-            fontSize={{ base: "md", lg: "2xl" }}
-          >
-            <Flex flexDirection={"row"} alignItems="center">
-              <PhoneIcon w={6} h={5} />
-              <Text
-                fontSize={{ base: "lg", lg: "2xl" }}
-                ml="2"
-                as="span"
-                fontWeight={"bold"}
-              >
-                {i18n.t("epikoinonia")}
+          <Flex justify="space-between" align="center" mb={6}>
+            <HeadingWithIcon icon={TimeIcon} title={i18n.t("orario")} />
+            <Flex align="center" gap={2}>
+              <Text fontSize="sm" color="gray.500" fontWeight="medium">
+                {isExamPeriod ? i18n.t("exams_period") : i18n.t("semester_period")}
               </Text>
+              <Switch
+                isChecked={isExamPeriod}
+                onChange={(e) => setisExamPeriod(e.target.checked)}
+                colorScheme="blue"
+                size="lg"
+              />
             </Flex>
+          </Flex>
 
-            <Flex
-              flexDirection={"row"}
-              alignItems="center"
-              justifyContent="space-between"
-              w="100%"
-              gap="3"
-              fontSize={{ base: "sm",  lg: "xl", }}
-            >
-              <Text>
-                {LIBRARY_PHONE_LIST[0]} <br />
-                {LIBRARY_PHONE_LIST[1]}
-              </Text>
-              <Text>
-                {" "}
-                {LIBRARY_PHONE_LIST[2]} <br /> {LIBRARY_PHONE_LIST[3]}{" "}
-              </Text>
-              <Text fontWeight="bold"> {i18n.t("imiorofos")} </Text>
-            </Flex>
-          </Flex>
+          <VStack spacing={3} align="stretch">
+            <ScheduleRow
+              label={i18n.t("defPar")}
+              time={LIBRARY_OPENING_HOURS[currentPeriod].on_weekdays}
+              dayType="weekdays"
+            />
+            <ScheduleRow
+              label={i18n.t("savvato")}
+              time={LIBRARY_OPENING_HOURS[currentPeriod].on_saturday}
+              dayType="saturday"
+            />
+            <ScheduleRow
+              label={i18n.t("kyriaki")}
+              time={LIBRARY_OPENING_HOURS[currentPeriod].on_sunday}
+              dayType="sunday"
+            />
+          </VStack>
+        </Box>
+
+        {/* Επικοινωνία Card */}
+        <Box
+          flex={1}
+          border="1px"
+          borderRadius="xl"
+          bg={useColorModeValue("white", "gray.800")}
+          borderColor={useColorModeValue("gray.200", "gray.700")}
+          boxShadow="lg"
+          p={6}
+          mt={{ base: 4, lg: 0 }}
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+        >
+          <HeadingWithIcon icon={PhoneIcon} title={i18n.t("epikoinonia")} mb={6} />
+
+          <VStack align="start" spacing={4} pl={2}>
+            <HStack align="start">
+              <Text fontWeight="bold" minW="100px">{i18n.t("imiorofos")}:</Text>
+              <VStack align="start" spacing={0}>
+                {LIBRARY_PHONE_LIST.map((phone, index) => (
+                  <Text key={index} color={useColorModeValue("blue.600", "blue.300")}>{phone}</Text>
+                ))}
+              </VStack>
+            </HStack>
+          </VStack>
         </Box>
       </Flex>
+
       <Button
-        color={useColorModeValue("#0050e0", "#f3f3f3")}
-        variant="ghost"
-        fontWeight="bold"
-        fontFamily="Syne"
-        fontSize={{ base: "lg", lg: "2xl" }}
+        mt={6}
+        colorScheme="blue"
+        variant="link"
+        fontSize="lg"
         rightIcon={
-          <Box ml="2">
-            <svg
-              width="15px"
-              viewBox="0 0 10 10"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0.873535 9L8.91951 1"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                stroke={useColorModeValue("#0050e0", "#f3f3f3")}
-              />
-              <path
-                d="M0.873535 1H8.91951V9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                stroke={useColorModeValue("#0050e0", "#f3f3f3")}
-              />
-            </svg>
-          </Box>
+          <Icon as={allowedDaysIcons.weekdays} /> // Using calendar icon as generic "link" icon for now or standard arrow
         }
-        onClick={(e) => {
-          i18n.language === "en" 
-            ? window.open("https://www.lib.uom.gr/index.php/en/") 
+        onClick={() => {
+          i18n.language === "en"
+            ? window.open("https://www.lib.uom.gr/index.php/en/")
             : window.open("https://www.lib.uom.gr/index.php/el/");
         }}
-        justifyContent="center"
       >
         {i18n.t("istoselidaVivliothikis")}
       </Button>
     </Flex>
   );
 }
+
+const HeadingWithIcon = ({ icon, title, mb }) => (
+  <HStack mb={mb} spacing={3}>
+    <Flex
+      p={2}
+      bg={useColorModeValue("blue.100", "blue.900")}
+      borderRadius="lg"
+      color={useColorModeValue("blue.600", "blue.200")}
+    >
+      <Icon as={icon} boxSize={5} />
+    </Flex>
+    <Text fontSize="xl" fontWeight="bold">
+      {title}
+    </Text>
+  </HStack>
+);
