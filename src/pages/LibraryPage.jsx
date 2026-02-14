@@ -46,10 +46,16 @@ export default function LibraryPage() {
   const [isExamPeriod, setisExamPeriod] = useState(false);
   const currentPeriod = isExamPeriod ? "InExams" : "InSemester";
 
-  // Get current day index (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+  // Theme colors
+  const cardBg = useColorModeValue("#0050e0", "#f3f3f3");
+  const cardBorder = useColorModeValue("#0050e0", "#f3f3f3");
+  const textColor = useColorModeValue("#f3f3f3", "black");
+  const highlightBg = useColorModeValue("whiteAlpha.200", "blackAlpha.100");
+  const iconColor = useColorModeValue("#f3f3f3", "black");
+
+  // Get current day index
   const currentDayIndex = new Date().getDay();
 
-  // Helper to check if a specific schedule corresponds to today
   const isToday = (dayType) => {
     if (dayType === 'weekdays' && currentDayIndex >= 1 && currentDayIndex <= 5) return true;
     if (dayType === 'saturday' && currentDayIndex === 6) return true;
@@ -66,21 +72,34 @@ export default function LibraryPage() {
         w="100%"
         justify="space-between"
         p={2}
-        bg={active ? useColorModeValue("blue.50", "whiteAlpha.200") : "transparent"}
+        bg={active ? highlightBg : "transparent"}
         borderRadius="md"
         borderLeft={active ? "4px solid" : "none"}
-        borderColor={useColorModeValue("blue.500", "blue.200")}
+        borderColor={useColorModeValue("white", "black")}
       >
-        <HStack>
-          <Icon as={allowedDaysIcons[dayType]} color={useColorModeValue("gray.600", "gray.300")} />
-          <Text fontWeight={active ? "bold" : "medium"}>{label}</Text>
+        <HStack spacing={3}>
+          <Icon as={allowedDaysIcons[dayType]} color={iconColor} boxSize={5} />
+          <Text fontWeight={active ? "bold" : "medium"} fontSize={{ base: "md", lg: "lg" }}>{label}</Text>
         </HStack>
         {isOpen ? (
-          <Badge colorScheme="green" variant="subtle" px={2} borderRadius="full">
+          <Badge
+            bg={useColorModeValue("white", "black")}
+            color={useColorModeValue("#0050e0", "#f3f3f3")}
+            variant="solid"
+            px={2}
+            borderRadius="full"
+            fontSize="sm"
+          >
             {time.start} - {time.end}
           </Badge>
         ) : (
-          <Badge colorScheme="red" variant="subtle" px={2} borderRadius="full">
+          <Badge
+            colorScheme="red"
+            variant="solid"
+            px={2}
+            borderRadius="full"
+            fontSize="sm"
+          >
             {i18n.t("kleista")}
           </Badge>
         )}
@@ -89,7 +108,7 @@ export default function LibraryPage() {
   };
 
   const allowedDaysIcons = {
-    weekdays: CalendarIcon, // Placeholder, usually a calendar looks good
+    weekdays: CalendarIcon,
     saturday: TimeIcon,
     sunday: TimeIcon
   };
@@ -101,6 +120,7 @@ export default function LibraryPage() {
       flexDirection="column"
       alignItems="center"
       fontFamily="Syne"
+      color={textColor}
     >
       {/* Wrapper container */}
       <Flex
@@ -117,26 +137,36 @@ export default function LibraryPage() {
         {/* Ωράριο Card */}
         <Box
           flex={1}
-          border="1px"
-          borderRadius="xl"
-          bg={useColorModeValue("white", "gray.800")}
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-          boxShadow="lg"
+          border="2px"
+          borderRadius="1rem"
+          bg={cardBg}
+          borderColor={cardBorder}
           p={6}
           display="flex"
           flexDirection="column"
         >
-          <Flex justify="space-between" align="center" mb={6}>
-            <HeadingWithIcon icon={TimeIcon} title={i18n.t("orario")} />
+          <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={2}>
+            <HeadingWithIcon icon={TimeIcon} title={i18n.t("orario")} color={textColor} />
             <Flex align="center" gap={2}>
-              <Text fontSize="sm" color="gray.500" fontWeight="medium">
+              <Text fontSize="sm" fontWeight="bold">
                 {isExamPeriod ? i18n.t("exams_period") : i18n.t("semester_period")}
               </Text>
               <Switch
                 isChecked={isExamPeriod}
                 onChange={(e) => setisExamPeriod(e.target.checked)}
-                colorScheme="blue"
+                colorScheme="whiteAlpha"
                 size="lg"
+                sx={{
+                  'span.chakra-switch__track': {
+                    bg: useColorModeValue('whiteAlpha.400', 'blackAlpha.300'),
+                  },
+                  'span.chakra-switch__track[data-checked]': {
+                    bg: useColorModeValue('white', 'black'),
+                  },
+                  'span.chakra-switch__thumb': {
+                    bg: useColorModeValue('#0050e0', '#f3f3f3'),
+                  }
+                }}
               />
             </Flex>
           </Flex>
@@ -163,25 +193,24 @@ export default function LibraryPage() {
         {/* Επικοινωνία Card */}
         <Box
           flex={1}
-          border="1px"
-          borderRadius="xl"
-          bg={useColorModeValue("white", "gray.800")}
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-          boxShadow="lg"
+          border="2px"
+          borderRadius="1rem"
+          bg={cardBg}
+          borderColor={cardBorder}
           p={6}
           mt={{ base: 4, lg: 0 }}
           display="flex"
           flexDirection="column"
           justifyContent="center"
         >
-          <HeadingWithIcon icon={PhoneIcon} title={i18n.t("epikoinonia")} mb={6} />
+          <HeadingWithIcon icon={PhoneIcon} title={i18n.t("epikoinonia")} mb={6} color={textColor} />
 
-          <VStack align="start" spacing={4} pl={2}>
-            <HStack align="start">
-              <Text fontWeight="bold" minW="100px">{i18n.t("imiorofos")}:</Text>
-              <VStack align="start" spacing={0}>
+          <VStack align="start" spacing={6} pl={2} w="100%">
+            <HStack align="start" w="100%">
+              <Text fontWeight="bold" minW="100px" fontSize="lg">{i18n.t("imiorofos")}:</Text>
+              <VStack align="start" spacing={1}>
                 {LIBRARY_PHONE_LIST.map((phone, index) => (
-                  <Text key={index} color={useColorModeValue("blue.600", "blue.300")}>{phone}</Text>
+                  <Text key={index} fontSize="lg" fontWeight="medium">{phone}</Text>
                 ))}
               </VStack>
             </HStack>
@@ -191,11 +220,35 @@ export default function LibraryPage() {
 
       <Button
         mt={6}
-        colorScheme="blue"
-        variant="link"
-        fontSize="lg"
+        color={useColorModeValue("#0050e0", "#f3f3f3")}
+        variant="ghost"
+        fontWeight="bold"
+        fontFamily="Syne"
+        fontSize={{ base: "lg", lg: "2xl" }}
         rightIcon={
-          <Icon as={allowedDaysIcons.weekdays} /> // Using calendar icon as generic "link" icon for now or standard arrow
+          <Box ml="2">
+            <svg
+              width="15px"
+              viewBox="0 0 10 10"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0.873535 9L8.91951 1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                stroke={useColorModeValue("#0050e0", "#f3f3f3")}
+              />
+              <path
+                d="M0.873535 1H8.91951V9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                stroke={useColorModeValue("#0050e0", "#f3f3f3")}
+              />
+            </svg>
+          </Box>
         }
         onClick={() => {
           i18n.language === "en"
@@ -209,17 +262,10 @@ export default function LibraryPage() {
   );
 }
 
-const HeadingWithIcon = ({ icon, title, mb }) => (
+const HeadingWithIcon = ({ icon, title, mb, color }) => (
   <HStack mb={mb} spacing={3}>
-    <Flex
-      p={2}
-      bg={useColorModeValue("blue.100", "blue.900")}
-      borderRadius="lg"
-      color={useColorModeValue("blue.600", "blue.200")}
-    >
-      <Icon as={icon} boxSize={5} />
-    </Flex>
-    <Text fontSize="xl" fontWeight="bold">
+    <Icon as={icon} boxSize={6} color={color} />
+    <Text fontSize={{ base: "xl", lg: "2xl" }} fontWeight="bold" color={color}>
       {title}
     </Text>
   </HStack>
